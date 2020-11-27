@@ -1,38 +1,78 @@
-version: '3.2'
-
+version: '2.4'
 services:
-
-  frontend:
-    build: frontend
-    ports:
-      - 20080:80
+  php:
+    build: ./docker/dockerfiles/php
     volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-
-  backend:
-    build: backend
-    ports:
-      - 21080:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-
-  mysql:
-    image: mysql:5.7
+      - ./:/var/www/html # also in nginx
+      - ./docker/etc/php/dev:/usr/local/etc/php/custom-postconf.d
+      - ./docker/local-data/composer:/root/.composer
+    depends_on:
+      - db
+      - smtp
+    restart: on-failure
     environment:
-      - MYSQL_ROOT_PASSWORD=verysecret
-      - MYSQL_DATABASE=yii2advanced
-      - MYSQL_USER=yii2advanced
-      - MYSQL_PASSWORD=secret
+      PHP_INI_SCAN_DIR: "/usr/local/etc/php/conf.d:/usr/local/etc/php/custom-postconf.d"
+      XDEBUG_CONFIG: "remote_host=host.docker.internal remote_port=9000 var_display_max_data=1024 var_display_max_depth=5"
+      PHP_IDE_CONFIG: "serverName=docker-yii2-advanced"
 
-  #pgsql:
-  #  image: postgres:9.5
-  #  environment:
-  #    - POSTGRES_DB=yii2advanced
-  #    - POSTGRES_USER=yii2advanced
-  #    - POSTGRES_PASSWORD=secret
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - 80:80
+    depends_on:
+      - php
+    volumes:
+      - ./:/var/www/html # from php
+      - ./docker/etc/nginx:/etc/nginx/conf.d
+      - ./docker/local-data/nginx-logs:/var/log/nginx
+    restart: on-failure
+
+  db:
+    image: library/mariadb:10.5.6
+#    entrypoint: ['/docker-entrypoint.sh', '--character-set-server=utf8', '--collation-server=utf8_general_ci']
+    ports:
+      - 3306:3306
+    volumes:
+      - ./docker/local-data/mysql-data/db:/var/lib/mysql
+      - ./docker/etc/mysql:/etc/mysql/conf.d
+      - ./docker/etc/mysql-init:/docker-entrypoint-initdb.d
+    environment:
+      TZ: GMT
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: yii2
+      MYSQL_USER: yii2
+      MYSQL_PASSWORD: yii2
+    restart: on-failure
+
+#  ftp:
+#    image: fauria/vsftpd
+#    volumes:
+#      - ./docker/local-data/ftp:/home/vsftpd
+#    environment:
+#      FTP_USER: ftp
+#      FTP_PASS: ftp
+#      LOG_STDOUT: 1
+#      REVERSE_LOOKUP_ENABLE: "NO"
+
+  smtp:
+    image: mailhog/mailhog
+    command: ["-smtp-bind-addr", "0.0.0.0:1025"]
+    user: root
+    expose:
+      - 1025
+    ports:
+      - 8025:8025
+
+  blackfire:
+    image: blackfire/blackfire
+    environment:
+      # Exposes the host BLACKFIRE_SERVER_ID and TOKEN environment variables.
+      - BLACKFIRE_SERVER_ID
+      - BLACKFIRE_SERVER_TOKEN
+      # You can also use global environment credentials
+      # BLACKFIRE_SERVER_ID: SERVER-ID
+      # BLACKFIRE_SERVER_TOKEN: SERVER-TOKEN
+
+#  selenium-chrome:
+#    image: selenium/standalone-chrome
+#    shm_size: "2G"
