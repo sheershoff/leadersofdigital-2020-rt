@@ -1,5 +1,25 @@
 .DEFAULT_GOAL := help
 
+#
+# Project related
+#
+
+docker-project-setup-users:    ## Project: setup users
+	docker-compose exec php ./yii user/user-password admin admin
+	docker-compose exec php ./yii user/user-password user1 user1
+	docker-compose exec php ./yii user/user-password user2 user2
+	docker-compose exec php ./yii user/user-password user3 user3
+	docker-compose exec php ./yii user/user-password user4 user4
+	docker-compose exec php ./yii user/user-password user5 user5
+	docker-compose exec php ./yii user/user-password user6 user6
+	docker-compose exec php ./yii user/user-password user7 user7
+	docker-compose exec php ./yii user/user-password user8 user8
+	docker-compose exec php ./yii user/user-password user9 user9
+
+#
+# General stuff
+#
+
 docker-init-project:     ## For docker: init project after cloning
 	make docker-composer-install
 	make docker-yii-init

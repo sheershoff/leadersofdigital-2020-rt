@@ -8,24 +8,25 @@ use common\models\User;
 use yii\console\ExitCode;
 
 /**
-  * Console command for user manupulations
+ * Console command for user manupulations
  * @package console\controllers
  */
 class UserController extends \yii\console\Controller
 {
     /**
      * Resets admin user password, auth_key and activates the user. Creates user if not exists.
+     * @param string $user
      * @param string $password Password to set for admin
      * @return int
      * @throws \Exception
      */
-    public function actionResetAdminPassword(string $password)
+    public function actionUserPassword(string $username, string $password)
     {
-        $user = User::findByUsername('admin');
+        $user = User::findByUsername($username);
         if (!$user) {
             $user = new User();
-            $user->username = 'admin';
-            $user->email = 'admin@example.com';
+            $user->username = $username;
+            $user->email = $username . '@example.com';
         }
         $user->status = User::STATUS_ACTIVE;
         $user->auth_key = bin2hex(random_bytes(16));

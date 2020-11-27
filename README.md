@@ -10,9 +10,23 @@ Installation
 127.0.0.1 backend.localhost
 ```
 1. Open http://frontend.localhost , http://backend.localhost 
-1. Run `docker-compose exec php ./yii user/reset-admin-password admin` to reset admin password to `admin`
+1. Run `make docker-project-setup-users`
 1. Login to the backend with
 ```
     admin
     admin
 ```
+
+or (N is number 1-9)
+
+```
+    userN
+    userM
+```
+
+
+Development
+===========
+
+Pretty much all helper commands for development are in the make file and one should stick to that practice.
+Run `make help` to get an idea about the commands.
