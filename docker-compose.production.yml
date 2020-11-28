@@ -6,11 +6,28 @@ services:
       - ./:/var/www/html # also in nginx
       - ./docker/etc/php/dev:/usr/local/etc/php/custom-postconf.d
       - ./docker/local-data/composer:/root/.composer
+    depends_on:
+      - db
     restart: on-failure
     environment:
       PHP_INI_SCAN_DIR: "/usr/local/etc/php/conf.d:/usr/local/etc/php/custom-postconf.d"
       XDEBUG_CONFIG: "remote_host=host.docker.internal remote_port=9000 var_display_max_data=1024 var_display_max_depth=5"
       PHP_IDE_CONFIG: "serverName=docker-yii2-advanced"
+
+  db:
+    image: library/mariadb:10.5.6
+    #    entrypoint: ['/docker-entrypoint.sh', '--character-set-server=utf8', '--collation-server=utf8_general_ci']
+    volumes:
+      - ./docker/local-data/mysql-data/db:/var/lib/mysql
+      - ./docker/etc/mysql:/etc/mysql/conf.d
+      - ./docker/etc/mysql-init:/docker-entrypoint-initdb.d
+    environment:
+      TZ: GMT
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: yii2
+      MYSQL_USER: yii2
+      MYSQL_PASSWORD: yii2
+    restart: on-failure
 
   nginx:
     image: nginx:stable-alpine
