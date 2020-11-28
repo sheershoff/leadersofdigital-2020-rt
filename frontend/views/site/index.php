@@ -6,6 +6,7 @@ $this->title = 'Языковая среда';
 ?>
 <script>
     var recognition = null;
+    var synth = null;
     var final_transcript = '';
     var final_span, interim_span;
 
@@ -36,6 +37,7 @@ $this->title = 'Языковая среда';
             interim_span = document.getElementById('interim_span');
 
             recognition = new webkitSpeechRecognition();
+            synth = window.speechSynthesis;
             recognition.continuous = true;
             recognition.interimResults = true;
 
@@ -52,12 +54,23 @@ $this->title = 'Языковая среда';
                 var interim_transcript = '';
                 for (var i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
-                        final_transcript += capitalize(event.results[i][0].transcript + '\n');
+                        final_transcript += capitalize(event.results[i][0].transcript + '.\n');
+                        var utterThis = new SpeechSynthesisUtterance(event.results[i][0].transcript);
+                        var voices = synth.getVoices();
+                        for(i = 0; i < voices.length ; i++) {
+                            if(voices[i].lang === 'en-US') {
+                                utterThis.voice = voices[i];
+                                utterThis.lang = 'en-US';
+                                utterThis.rate = 0.8;
+                                break;
+                            }
+                        }
+                        synth.cancel();
+                        synth.speak(utterThis);
                     } else {
                         interim_transcript += event.results[i][0].transcript;
                     }
                 }
-                final_transcript = final_transcript;
                 final_span.innerHTML = linebreak(final_transcript);
                 interim_span.innerHTML = linebreak(interim_transcript);
             };
