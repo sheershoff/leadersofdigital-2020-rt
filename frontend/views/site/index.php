@@ -57,7 +57,7 @@ $this->title = 'Языковая среда';
                 for (var i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         final_phrase = event.results[i][0].transcript;
-                        final_transcript += capitalize(final_phrase + '.\n');
+                        final_transcript += ' Me: ' + capitalize(final_phrase + '.\n');
                         var utterThis = new SpeechSynthesisUtterance(final_phrase + '.');
                         var voices = synth.getVoices();
                         for(i = 0; i < voices.length ; i++) {
@@ -79,15 +79,15 @@ $this->title = 'Языковая среда';
                             data = JSON.parse(data);
                             console.debug(data);
                             var bot_answer = data.answer;
-                            final_transcript += bot_answer + '.\n';
+                            final_transcript += 'Him: ' + bot_answer + '.\n';
 
                             var utterThat = new SpeechSynthesisUtterance(bot_answer + '.');
                             var voices = synth.getVoices();
                             for(i = 0; i < voices.length ; i++) {
-                                if(voices[i].lang === 'en-US') {
+                                if(voices[i].lang === 'en-GB' && voices[i].name.includes('Male')) {
                                     utterThat.voice = voices[i];
-                                    utterThat.lang = 'en-US';
-                                    utterThat.rate = 0.8;
+                                    utterThat.lang = 'en-GB';
+                                    utterThat.rate = 1;
                                     break;
                                 }
                             }
