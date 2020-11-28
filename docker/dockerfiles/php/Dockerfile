@@ -37,7 +37,7 @@ RUN cd /tmp \
     && git clone https://git.php.net/repository/pecl/networking/ssh2.git \
     && cd /tmp/ssh2/ \
     && .travis/build.sh \
-    && docker-php-ext-enable ssh2
+    && docker-php-ext-enable ssh2 \
 # Upgrade xDebug
 #ENV XDEBUG_VERSION 2.8.0
 #RUN pecl install xdebug-$XDEBUG_VERSION && \
@@ -47,7 +47,8 @@ RUN cd /tmp \
 #xdebug.idekey = \"PHPSTORM\"\n\
 #xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 # End Upgrade xDebug
-RUN rm -rf /var/lib/apt/lists/* && \
-    composer self-update && \
-    composer global require "fxp/composer-asset-plugin:^1.2.0" && \
-    composer config -g github-oauth.github.com 945459df587e1617426f43eacbf0468381453180
+    && rm -rf /var/lib/apt/lists/*
+RUN composer self-update 1.9.0 && \
+    composer global require "fxp/composer-asset-plugin:^1.2.0"
+
+RUN composer config -g github-oauth.github.com b61fcff24e8e33de55584a313db4ccd73445f7ef
