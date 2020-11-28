@@ -21,7 +21,7 @@ or (N is number 1-9)
 
 ```
     userN
-    userM
+    userN
 ```
 
 
