@@ -19,6 +19,7 @@ $this->title = 'Языковая среда';
     }
 
     function startTalk(event) {
+        synth.cancel();
         recognition.lang = 'en-US';
         recognition.start();
     }
@@ -52,10 +53,12 @@ $this->title = 'Языковая среда';
 
             recognition.onresult = function (event) {
                 var interim_transcript = '';
+                var final_phrase = '';
                 for (var i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
-                        final_transcript += capitalize(event.results[i][0].transcript + '.\n');
-                        var utterThis = new SpeechSynthesisUtterance(event.results[i][0].transcript);
+                        final_phrase = event.results[i][0].transcript;
+                        final_transcript += capitalize(final_phrase + '.\n');
+                        var utterThis = new SpeechSynthesisUtterance(final_phrase + '.');
                         var voices = synth.getVoices();
                         for(i = 0; i < voices.length ; i++) {
                             if(voices[i].lang === 'en-US') {
@@ -67,6 +70,35 @@ $this->title = 'Языковая среда';
                         }
                         synth.cancel();
                         synth.speak(utterThis);
+                        $.ajax('/chat/phrase', {
+                            method: 'POST',
+                            data: {
+                                phrase: final_phrase
+                            }
+                        }).done(function (data, textStatus, jqXHR){
+                            data = JSON.parse(data);
+                            console.debug(data);
+                            var bot_answer = data.answer;
+                            final_transcript += bot_answer + '.\n';
+
+                            var utterThat = new SpeechSynthesisUtterance(bot_answer + '.');
+                            var voices = synth.getVoices();
+                            for(i = 0; i < voices.length ; i++) {
+                                if(voices[i].lang === 'en-US') {
+                                    utterThat.voice = voices[i];
+                                    utterThat.lang = 'en-US';
+                                    utterThat.rate = 0.8;
+                                    break;
+                                }
+                            }
+                            //synth.cancel();
+                            synth.speak(utterThat);
+
+                            final_span.innerHTML = linebreak(final_transcript);
+                        }).fail(function (data, textStatus, jqXHR){
+                            final_transcript += 'Error: ' + textStatus + '\n';
+                            final_span.innerHTML = linebreak(final_transcript);
+                        });
                     } else {
                         interim_transcript += event.results[i][0].transcript;
                     }

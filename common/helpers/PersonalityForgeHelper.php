@@ -6,7 +6,7 @@ namespace common\helpers;
 
 class PersonalityForgeHelper
 {
-    public function sendReceive($msg, $botid = 3374)
+    public function sendReceive($msg, $botid = 2)
     {
         $apiKey = \Yii::$app->params['personalityforge']['apiKey'];
         $apiSecret = \Yii::$app->params['personalityforge']['apiSecret'];
@@ -21,7 +21,7 @@ class PersonalityForgeHelper
                 'firstName' => 'Tugger',
                 'lastName' => 'Sufani',
                 'gender' => 'm',
-                'externalID' => '0'
+                'externalID' => 'user_id_0'
             )
         );
 
@@ -50,7 +50,7 @@ class PersonalityForgeHelper
         if (!$responseObject->success) {
             return 'Chatbot is frustrated: ' . $responseObject->errorType . ' : ' . $responseObject->errorMessage;
         } else {
-            return $responseObject->message;
+            return $responseObject->message->message;
         }
 
     }

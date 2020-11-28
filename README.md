@@ -9,7 +9,23 @@ Installation
 127.0.0.1 frontend.localhost
 127.0.0.1 backend.localhost
 ```
-1. Open http://frontend.localhost , http://backend.localhost 
+1. Open http://frontend.localhost , http://backend.localhost
+1. To setup chatbots go to personalityforge site, register, enable free api and put the following code to `common/config/params-local.php` with key and secret from their API
+
+```
+<?php
+return [
+    'personalityforge' => [
+        'apiKey' => '',
+        'apiSecret' => '',
+    ],
+];
+
+```
+
+Users
+=====
+ 
 1. Run `make docker-project-setup-users`
 1. Login to the backend with
 ```
@@ -23,6 +39,7 @@ or (N is number 1-9)
     userN
     userN
 ```
+
 
 
 Development
