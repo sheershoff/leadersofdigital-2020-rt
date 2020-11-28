@@ -39,4 +39,12 @@ services:
       - ./:/var/www/html # from php
       - ./docker/etc/nginx:/etc/nginx/conf.d
       - ./docker/local-data/nginx-logs:/var/log/nginx
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     restart: on-failure
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
