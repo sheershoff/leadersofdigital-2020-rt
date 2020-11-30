@@ -23,7 +23,7 @@ services:
       - php
     volumes:
       - ./:/var/www/html # from php
-      - ./docker/etc/nginx:/etc/nginx/conf.d
+      - ./docker/etc/nginx-dev:/etc/nginx/conf.d
       - ./docker/local-data/nginx-logs:/var/log/nginx
     restart: on-failure
 
